@@ -1,0 +1,1302 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PLANILLA DE ASISTENCIA - CAPACITA CLICK NOCAIMA</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <!-- Toastify CSS -->
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Custom Styles -->
+    <style>
+        :root {
+            --primary-color: #005A9C; /* Deep institutional blue */
+            --accent-color: #4CAF50; /* A vibrant, professional green */
+            --accent-color-dark: #409144;
+            --background-color: #f4f7f9; /* Light, clean gray */
+            --text-color: #333;
+            --text-light-color: #666;
+            --card-background: #ffffff;
+            --shadow-color: rgba(0, 0, 0, 0.08);
+            --border-color: #e0e0e0;
+            --danger-color: #d32f2f;
+            --danger-color-dark: #b71c1c;
+        }
+
+        body {
+            background-color: var(--background-color);
+            color: var(--text-color);
+            font-family: 'Poppins', sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        .card {
+            background: var(--card-background);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 4px 12px var(--shadow-color);
+            transition: all 0.3s ease-in-out;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 24px var(--shadow-color);
+        }
+
+        .btn {
+            @apply font-bold py-2 px-6 shadow-md transition-all duration-200 ease-in-out;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            border-radius: 9999px;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+        }
+        .btn:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        .btn-primary:hover {
+            background-color: #004a80;
+        }
+
+        .btn-secondary {
+            background-color: #e0e0e0;
+            color: #333;
+        }
+        .btn-secondary:hover {
+            background-color: #d1d1d1;
+        }
+
+        .btn-success {
+            background-color: var(--accent-color);
+            color: white;
+        }
+        .btn-success:hover {
+            background-color: var(--accent-color-dark);
+        }
+
+        .btn-danger {
+            background-color: var(--danger-color);
+            color: white;
+        }
+        .btn-danger:hover {
+            background-color: var(--danger-color-dark);
+        }
+
+        .input-field {
+            @apply w-full px-4 py-2 border rounded-lg transition-all duration-300;
+            background-color: #fdfdfd;
+            border-color: #ccc;
+        }
+        .input-field:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(0, 90, 156, 0.2);
+        }
+
+        #loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.8);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            color: var(--primary-color);
+            font-size: 1.5rem;
+            backdrop-filter: blur(4px);
+        }
+        .btn-sign {
+             @apply w-full mt-4 font-bold py-3 rounded-b-lg;
+             background-color: var(--accent-color);
+             color: white;
+             transition: background-color 0.2s;
+        }
+        .btn-sign:hover {
+            background-color: var(--accent-color-dark);
+        }
+
+        .btn-closed {
+            @apply w-full mt-4 bg-gray-400 text-white font-bold py-3 rounded-b-lg cursor-not-allowed;
+        }
+
+        /* New style for details/summary */
+        details.card > summary {
+            padding: 1rem 1.5rem;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1.1rem;
+            color: var(--primary-color);
+            transition: background-color 0.2s;
+        }
+        details.card > summary:hover {
+            background-color: rgba(0, 90, 156, 0.05);
+        }
+        details[open] > summary {
+            border-bottom: 1px solid var(--border-color);
+        }
+    </style>
+    
+    <!-- Hidden logo for PDF generation -->
+    <img id="pdf-logo" src="https://i.ibb.co/7t3wNFjN/ESCUDO-nocaima-300x300.png" style="display: none;" />
+</head>
+<body class="antialiased">
+
+    <!-- Data Consent Modal -->
+    <div id="consent-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex justify-center items-center p-4 z-[9999] hidden">
+        <div id="consent-card" class="card max-w-lg w-full p-6 md:p-8 rounded-2xl shadow-2xl border-t-4 border-amber-400 transform transition-all duration-300 scale-95 opacity-0">
+            <div class="text-center">
+                <div class="text-6xl mb-4">
+                    <span>⚠️</span>
+                </div>
+                <h3 class="text-xl md:text-2xl font-bold text-gray-800 mb-3">Tratamiento de Datos Personales</h3>
+                <p class="text-md text-gray-600 mb-8">
+                    ¿Acepta usted el tratamiento de datos personales por parte de la Alcaldía de Nocaima?
+                </p>
+            </div>
+            
+            <div class="flex flex-col sm:flex-row justify-center items-center gap-4">
+                <button id="consent-yes-btn" class="btn btn-success w-full sm:w-auto text-lg py-3 px-8">
+                    <i class="fas fa-check-circle mr-2"></i>SI
+                </button>
+                <button id="consent-no-btn" class="btn btn-danger w-full sm:w-auto text-lg py-3 px-8">
+                    <i class="fas fa-times-circle mr-2"></i>NO
+                </button>
+            </div>
+
+            <div class="text-center mt-8">
+                <a href="https://nocaimacundinamarca.micolombiadigital.gov.co/sites/nocaimacundinamarca/content/files/000847/42317_habeas-data--ley-1581-de-2012-tratamiento-datos-personales.pdf" 
+                   target="_blank" 
+                   rel="noopener noreferrer"
+                   class="text-sm text-gray-500 hover:text-primary-color hover:underline transition-colors duration-200">
+                    <i class="fas fa-file-contract mr-1"></i>
+                    Consultar Política de Datos Personales
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div id="loading-overlay">
+        <i class="fas fa-spinner fa-spin fa-2x mb-4"></i>
+        <p>Cargando Planillas Disponibles...</p>
+    </div>
+
+    <div class="container mx-auto p-4 md:p-8">
+        <!-- Header -->
+        <header class="flex flex-col md:flex-row justify-between items-center mb-8 p-4 rounded-xl shadow-lg card">
+            <div class="flex items-center">
+                <img src="https://i.ibb.co/7t3wNFjN/ESCUDO-nocaima-300x300.png" alt="ESCUDO NOCAIMA" class="h-16 md:h-20 mr-4">
+                <div>
+                    <h1 class="text-xl md:text-3xl font-bold text-gray-800">PLANILLA DE ASISTENCIA</h1>
+                    <p class="text-sm md:text-md text-gray-600">CAPACITA CLICK NOCAIMA</p>
+                </div>
+            </div>
+            <button id="admin-unlock-btn" class="btn btn-secondary mt-4 md:mt-0"><i class="fas fa-lock mr-2"></i> Admin</button>
+        </header>
+
+        <main>
+            <!-- Planillas Card View -->
+            <div id="planillas-view" class="flex flex-col items-center">
+                <h2 class="text-2xl font-bold mb-6 text-center text-gray-700 w-full">Planillas de Asistencia Disponibles</h2>
+                <div id="planillas-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full max-w-6xl">
+                    <!-- Open planilla cards will be injected here -->
+                </div>
+
+                <div class="w-full max-w-6xl mt-8">
+                    <details class="card rounded-lg shadow-lg overflow-hidden">
+                        <summary class="p-4 cursor-pointer font-bold text-lg text-gray-700 hover:bg-gray-100/50">
+                            <i class="fas fa-history mr-2"></i>
+                            Planillas Cerradas
+                        </summary>
+                        <div id="closed-planillas-grid" class="p-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            <!-- Closed planilla cards will be injected here -->
+                        </div>
+                    </details>
+                </div>
+            </div>
+
+            <!-- Main Content View (Attendance Form + Dashboard) -->
+            <div id="main-content-view" class="hidden mt-6">
+                 <button id="back-to-planillas-btn" class="btn btn-primary mb-6"><i class="fas fa-arrow-left mr-2"></i> Volver a la lista</button>
+                <!-- Attendance Registration Panel -->
+                <div id="attendance-panel" class="card p-6 rounded-xl shadow-md mb-8">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-2xl font-bold text-gray-700" id="topic-title"></h2>
+                        <div id="countdown-timer" class="text-lg font-semibold text-red-600"></div>
+                    </div>
+                    <form id="attendance-form">
+                        <div id="participants-container" class="space-y-4">
+                            <!-- Participant rows will be injected here -->
+                        </div>
+                        <div class="flex justify-between items-center mt-6">
+                            <button type="button" id="add-participant-btn" class="btn btn-primary py-3 text-lg"><i class="fas fa-plus mr-2"></i> Agregar Asistente</button>
+                            <button type="submit" id="submit-attendance-btn" class="btn btn-success py-3 text-lg"><i class="fas fa-save mr-2"></i> GUARDAR Y GENERAR CERTIFICADO</button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Dashboard Preview Panel -->
+                <div id="dashboard-preview-panel" class="mt-8 card p-6 rounded-xl shadow-md">
+                    <h2 class="text-2xl font-bold mb-4 text-gray-700">Estadísticas e Inscritos</h2>
+                    <div id="user-dashboard-content" class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                        <div class="p-4 bg-white rounded-lg shadow flex flex-col items-center justify-center">
+                             <h3 class="font-bold text-gray-600 mb-2">Asistentes Registrados</h3>
+                            <p class="text-7xl font-bold text-sky-500" id="total-attendees">0</p>
+                        </div>
+                        <div class="p-4 bg-white rounded-lg shadow">
+                            <h3 class="font-bold text-gray-600 text-center mb-2">Asistentes por Secretaría</h3>
+                            <canvas id="secretaria-chart"></canvas>
+                        </div>
+                        <div class="p-4 bg-white rounded-lg shadow">
+                            <h3 class="font-bold text-gray-600 text-center mb-2">Asistencia por Fecha</h3>
+                            <canvas id="date-chart"></canvas>
+                        </div>
+                    </div>
+                    <div class="mt-6">
+                        <h3 class="text-xl font-bold mb-4 text-gray-600">Lista de Asistentes</h3>
+                        <div class="overflow-x-auto max-h-60">
+                            <table class="min-w-full bg-white rounded-lg shadow">
+                                <thead class="bg-gray-200 sticky top-0">
+                                    <tr>
+                                        <th class="py-2 px-4 text-left">Nombre Completo</th>
+                                        <th class="py-2 px-4 text-left">Secretaría</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="simple-attendees-table-body">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- The dashboard panel has been moved to a new, admin-only reports panel -->
+            </div>
+
+            <!-- Reports Panel (for Admins) -->
+            <div id="reports-panel" class="hidden mt-6 card p-6 rounded-xl shadow-md">
+                <button id="back-to-admin-panel-btn" class="btn btn-primary mb-6"><i class="fas fa-arrow-left mr-2"></i> Volver al Panel de Admin</button>
+                <h2 class="text-2xl font-bold mb-4 text-gray-700" id="reports-topic-title">Dashboard y Reportes</h2>
+                <div class="mt-6">
+                    <h3 class="text-xl font-bold mb-4 text-gray-600">Lista de Asistentes</h3>
+                    <div class="flex flex-wrap gap-2 mb-4">
+                        <button id="export-pdf-btn" class="btn btn-secondary"><i class="fas fa-file-pdf mr-2"></i> PDF</button>
+                        <button id="export-csv-btn" class="btn btn-secondary"><i class="fas fa-file-csv mr-2"></i> Excel</button>
+                        <button id="print-btn" class="btn btn-secondary"><i class="fas fa-print mr-2"></i> Imprimir</button>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full bg-white rounded-lg shadow">
+                            <thead class="bg-gray-200">
+                                <tr>
+                                    <th class="py-2 px-4 text-left">Nombre Completo</th>
+                                    <th class="py-2 px-4 text-left">Documento</th>
+                                    <th class="py-2 px-4 text-left">Contacto</th>
+                                    <th class="py-2 px-4 text-left">Secretaría</th>
+                                </tr>
+                            </thead>
+                            <tbody id="attendees-table-body">
+                                <!-- Attendee rows will be injected here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Admin Panel -->
+            <div id="admin-panel" class="hidden mt-6 card p-6 rounded-xl shadow-md">
+                 <button id="back-to-planillas-btn-admin" class="btn btn-primary mb-6"><i class="fas fa-arrow-left mr-2"></i> Volver a Planillas</button>
+                <h2 class="text-2xl font-bold mb-4 text-gray-700">Panel de Administración</h2>
+                
+                <!-- Create new topic -->
+                <div class="p-4 border rounded-lg bg-white/50 mb-8">
+                    <h3 class="text-xl font-bold mb-4 text-gray-600">Crear Nueva Planilla</h3>
+                    <form id="admin-form">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label for="admin-topic-name" class="block font-bold mb-1">Nombre de la Planilla/Tema</label>
+                                <input type="text" id="admin-topic-name" class="input-field" placeholder="Ej: Capacitación en Ofimática">
+                            </div>
+                            <div>
+                                <label for="admin-topic-id" class="block font-bold mb-1">ID del Tema (Automático)</label>
+                                <input type="text" id="admin-topic-id" class="input-field bg-gray-200" placeholder="Ej: capacitacion_ofimatica" readonly>
+                                 <small class="text-gray-500">Se genera a partir del nombre.</small>
+                            </div>
+                            <div>
+                                <label for="admin-secretaria" class="block font-bold mb-1">Secretaría Responsable</label>
+                                <select id="admin-secretaria" class="input-field"></select>
+                            </div>
+                            <div>
+                                <label for="admin-deadline" class="block font-bold mb-1">Fecha Límite de Registro</label>
+                                <input type="datetime-local" id="admin-deadline" class="input-field">
+                            </div>
+                            <div class="md:col-span-2">
+                                <label for="admin-signature-url" class="block font-bold mb-1">URL de imagen para la firma (Opcional)</label>
+                                <input type="url" id="admin-signature-url" class="input-field" placeholder="https://ejemplo.com/firma.png">
+                            </div>
+                        </div>
+                        <div class="mt-6 flex justify-end space-x-4">
+                            <button type="button" id="admin-clear-btn" class="btn btn-secondary">Limpiar</button>
+                            <button type="submit" id="admin-save-btn" class="btn btn-success"><i class="fas fa-save mr-2"></i> Guardar Tema</button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- View Reports -->
+                <div class="p-4 border rounded-lg bg-white/50">
+                    <h3 class="text-xl font-bold mb-4 text-gray-600">Imprimir y Exportar Reportes</h3>
+                    <div id="admin-reports-list" class="space-y-3">
+                        <!-- Admin reports list will be injected here -->
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <footer class="text-center py-8">
+        <p class="text-sm text-gray-600">ALCALDIA DE NOCAIMA CUNDINAMARCA - 2025</p>
+    </footer>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+
+    <!-- Helper Libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
+
+    <!-- Main Application Logic -->
+    <script type="module">
+        // --- FIX for ReferenceError ---
+        // This function is likely called by an old, leftover inline event handler (`onchange`).
+        // We define it globally and delegate to the correct function `showFormView` to prevent crashing.
+        window.loadTopicData = (topicId) => {
+            console.warn("Legacy function `loadTopicData` was called. Redirecting to modern flow.", topicId);
+            showFormView(topicId);
+        };
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyB_0sKkUE9ajPrlVh2uKMnLsr-2vnfFQSU",
+            authDomain: "planilladigital-67237.firebaseapp.com",
+            projectId: "planilladigital-67237",
+            storageBucket: "planilladigital-67237.firebasestorage.app",
+            messagingSenderId: "256082768040",
+            appId: "1:256082768040:web:ac0b0a08c132322a02529d"
+        };
+
+        // --- INICIALIZACIÓN ---
+        const app = firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        const auth = firebase.auth();
+
+        // --- ELEMENTOS DEL DOM ---
+        const loadingOverlay = document.getElementById('loading-overlay');
+        const planillasView = document.getElementById('planillas-view');
+        const planillasGrid = document.getElementById('planillas-grid');
+        const mainContentView = document.getElementById('main-content-view');
+        const adminPanel = document.getElementById('admin-panel');
+        const reportsPanel = document.getElementById('reports-panel'); // New
+        const adminUnlockBtn = document.getElementById('admin-unlock-btn');
+        const backToPlanillasBtn = document.getElementById('back-to-planillas-btn');
+        const backToPlanillasBtnAdmin = document.getElementById('back-to-planillas-btn-admin');
+        const backToAdminPanelBtn = document.getElementById('back-to-admin-panel-btn'); // New
+        const adminReportsList = document.getElementById('admin-reports-list'); // New
+        const consentModal = document.getElementById('consent-modal');
+        const consentCard = document.getElementById('consent-card');
+        const consentYesBtn = document.getElementById('consent-yes-btn');
+        const consentNoBtn = document.getElementById('consent-no-btn');
+
+        // --- CONSTANTES ---
+        const SECRETARIAS = ["GOBIERNO", "FINANCIERA", "SOCIAL", "PLANEACION", "TICS", "TALENTO HUMANO", "CONTROL INTERNO", "GENERAL", "DES. ECONOMICO", "SST"];
+        const TIPOS_POBLACION = ["Ninguno", "Afrodescendiente", "ROM (Gitano)", "Indígena", "Discapacitado", "Víctima del Conflicto", "LGBTIQ+", "Otro"];
+
+        // --- VARIABLES GLOBALES ---
+        let currentTopicId = null;
+        let topicIdForConsent = null; // For data consent flow
+        let countdownInterval = null;
+        let unsubscribeFromTopic = null;
+        let secretariaChart = null;
+        let dateChart = null;
+        let currentAttendees = [];
+        let allTopics = []; // Cache for admin view
+
+        // --- FLUJO PRINCIPAL ---
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                await auth.signInAnonymously();
+                console.log("Usuario autenticado anónimamente.");
+                await loadAndDisplayPlanillas();
+            } catch (error) {
+                console.error("Error en la inicialización:", error);
+                loadingOverlay.innerHTML = `<i class="fas fa-exclamation-triangle mr-3"></i> Error de conexión. Verifique la consola.`;
+            } finally {
+                loadingOverlay.style.display = 'none';
+            }
+        });
+
+        async function fetchAllTopics() {
+            const metadataDoc = await db.collection('_metadata').doc('topics').get();
+            if (!metadataDoc.exists) {
+                return [];
+            }
+            allTopics = metadataDoc.data().list || [];
+            return allTopics;
+        }
+
+        async function loadAndDisplayPlanillas() {
+            planillasGrid.innerHTML = '';
+            const closedPlanillasGrid = document.getElementById('closed-planillas-grid');
+            if (closedPlanillasGrid) {
+                closedPlanillasGrid.innerHTML = '';
+            }
+            loadingOverlay.style.display = 'flex';
+            
+            try {
+                const topics = await fetchAllTopics();
+
+                if (topics.length === 0) {
+                    planillasGrid.innerHTML = `<p class="col-span-full text-center text-gray-500">No hay planillas disponibles en este momento.</p>`;
+                    loadingOverlay.style.display = 'none';
+                    return;
+                }
+
+                const configPromises = topics.map(topic => db.collection(topic.id).doc('_config').get());
+                const configSnapshots = await Promise.all(configPromises);
+
+                const planillasData = configSnapshots.map((snap, index) => {
+                    if (!snap.exists) return null;
+                    return {
+                        id: topics[index].id,
+                        ...snap.data()
+                    }
+                }).filter(p => p && p.name);
+
+                const now = new Date();
+                const openPlanillas = [];
+                const closedPlanillas = [];
+
+                planillasData.forEach(planilla => {
+                    const deadline = planilla.fechaLimite ? planilla.fechaLimite.toDate() : null;
+                    const isOpen = deadline ? (planilla.status === 'activo' && now < deadline) : false;
+                    if (isOpen) {
+                        openPlanillas.push(planilla);
+                    } else {
+                        closedPlanillas.push(planilla);
+                    }
+                });
+
+                openPlanillas.sort((a, b) => (b.fechaLimite ? b.fechaLimite.toDate() : 0) - (a.fechaLimite ? a.fechaLimite.toDate() : 0));
+                closedPlanillas.sort((a, b) => (b.fechaLimite ? b.fechaLimite.toDate() : 0) - (a.fechaLimite ? a.fechaLimite.toDate() : 0));
+
+                planillasGrid.innerHTML = '';
+                if (openPlanillas.length === 0) {
+                    planillasGrid.innerHTML = `<p class="col-span-full text-center text-gray-500">No hay planillas disponibles en este momento.</p>`;
+                } else {
+                    openPlanillas.forEach(p => renderPlanillaCard(p, planillasGrid));
+                }
+
+                if (closedPlanillasGrid) {
+                    closedPlanillasGrid.innerHTML = '';
+                    if (closedPlanillas.length === 0) {
+                        closedPlanillasGrid.innerHTML = `<p class="col-span-full text-center text-gray-500">No hay planillas cerradas.</p>`;
+                    } else {
+                        closedPlanillas.forEach(p => renderPlanillaCard(p, closedPlanillasGrid));
+                    }
+                }
+
+            } catch (error) {
+                console.error("Error cargando la lista de planillas:", error);
+                planillasGrid.innerHTML = `<p class="col-span-full text-center text-red-500">Error al cargar las planillas.</p>`;
+            } finally {
+                loadingOverlay.style.display = 'none';
+            }
+        }
+
+        function renderPlanillaCard(planilla, targetGrid) {
+            const card = document.createElement('div');
+            card.className = 'card rounded-lg shadow-lg flex flex-col overflow-hidden';
+
+            const now = new Date();
+            const deadline = planilla.fechaLimite ? planilla.fechaLimite.toDate() : null;
+            const isOpen = deadline ? (planilla.status === 'activo' && now < deadline) : false;
+            const deadlineText = deadline ? `Cierra: ${deadline.toLocaleString()}` : 'Fecha no definida';
+
+            const statusClass = isOpen ? 'bg-green-500' : 'bg-red-500';
+            const statusText = isOpen ? 'ABIERTA' : 'CERRADA';
+
+            card.innerHTML = `
+                <div class="p-6 flex-grow">
+                    <div class="flex justify-between items-start">
+                        <h3 class="text-xl font-bold text-gray-800 mb-2">${planilla.name}</h3>
+                        <span class="text-xs font-bold text-white px-2 py-1 rounded-full ${statusClass}">${statusText}</span>
+                    </div>
+                    <p class="text-sm text-gray-600">Responsable: ${planilla.secretariaResponsable || 'No asignado'}</p>
+                    <p class="text-sm text-gray-500 mt-2">${deadlineText}</p>
+                </div>
+                <button 
+                    class="${isOpen ? 'btn-sign' : 'btn-closed'}" 
+                    ${isOpen ? `data-topic-id="${planilla.id}"` : 'disabled'}>
+                    <i class="fas ${isOpen ? 'fa-pen-to-square' : 'fa-lock'} mr-2"></i>
+                    ${isOpen ? 'Firmar Asistencia' : 'Cerrada'}
+                </button>
+            `;
+            targetGrid.appendChild(card);
+        }
+
+        // --- MANEJO DE VISTAS Y EVENTOS ---
+
+        planillasGrid.addEventListener('click', (e) => {
+            const button = e.target.closest('.btn-sign');
+            if (button) {
+                const topicId = button.dataset.topicId;
+                requestConsent(topicId);
+            }
+        });
+
+        function requestConsent(topicId) {
+            topicIdForConsent = topicId;
+            consentModal.classList.remove('hidden');
+            // Trigger animation
+            setTimeout(() => {
+                consentCard.classList.remove('scale-95', 'opacity-0');
+            }, 50);
+        }
+
+        function closeConsentModal() {
+            consentCard.classList.add('scale-95', 'opacity-0');
+            setTimeout(() => {
+                consentModal.classList.add('hidden');
+            }, 300);
+        }
+
+        consentYesBtn.addEventListener('click', () => {
+            closeConsentModal();
+            showFormView(topicIdForConsent);
+        });
+
+        consentNoBtn.addEventListener('click', () => {
+            closeConsentModal();
+            showPlanillasView();
+        });
+
+        function showFormView(topicId) {
+            planillasView.style.display = 'none';
+            adminPanel.style.display = 'none';
+            reportsPanel.style.display = 'none';
+            mainContentView.style.display = 'block';
+            loadTopicData(topicId);
+        }
+
+        function showPlanillasView() {
+            if (unsubscribeFromTopic) unsubscribeFromTopic();
+            mainContentView.style.display = 'none';
+            adminPanel.style.display = 'none';
+            reportsPanel.style.display = 'none';
+            planillasView.style.display = 'block';
+            loadAndDisplayPlanillas();
+        }
+
+        function showAdminView() {
+            if (unsubscribeFromTopic) unsubscribeFromTopic();
+            planillasView.style.display = 'none';
+            mainContentView.style.display = 'none';
+            reportsPanel.style.display = 'none';
+            adminPanel.style.display = 'block';
+            populateAdminForm();
+            loadAdminReportsList();
+        }
+        
+        backToPlanillasBtn.addEventListener('click', showPlanillasView);
+        backToPlanillasBtnAdmin.addEventListener('click', showPlanillasView);
+        backToAdminPanelBtn.addEventListener('click', showAdminView);
+
+        adminUnlockBtn.addEventListener('click', () => {
+            const password = prompt('Ingrese la contraseña de administrador:');
+            if (password === 'Nocaimatic2026*') {
+                showToast('Acceso de administrador concedido.', 'success');
+                showAdminView();
+            } else if (password) {
+                showToast('Contraseña incorrecta.', 'error');
+            }
+        });
+
+        // --- LÓGICA DEL FORMULARIO DE ASISTENCIA ---
+
+        async function loadTopicData(topicId) {
+            currentTopicId = topicId;
+            if (unsubscribeFromTopic) unsubscribeFromTopic();
+
+            const configDoc = await db.collection(topicId).doc('_config').get();
+            if (!configDoc.exists) {
+                showToast('Error: No se encontró la configuración de esta planilla.', 'error');
+                showPlanillasView();
+                return;
+            }
+            const config = configDoc.data();
+            
+            document.getElementById('topic-title').textContent = config.name;
+            
+            const deadline = config.fechaLimite.toDate();
+            startCountdown(deadline);
+
+            document.getElementById('participants-container').innerHTML = '';
+            addParticipantRow();
+            listenForAttendanceChanges(topicId, 'user');
+        }
+        
+        function startCountdown(deadline) {
+            const countdownEl = document.getElementById('countdown-timer');
+            if (countdownInterval) clearInterval(countdownInterval);
+            countdownInterval = setInterval(() => {
+                const now = new Date().getTime();
+                const distance = deadline.getTime() - now;
+                if (distance < 0) {
+                    clearInterval(countdownInterval);
+                    countdownEl.textContent = "TIEMPO EXPIRADO";
+                    return;
+                }
+                const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+                countdownEl.textContent = `Cierra en: ${days}d ${hours}h ${minutes}m ${seconds}s`;
+            }, 1000);
+        }
+
+        let participantCounter = 0;
+        function addParticipantRow() {
+            participantCounter++;
+            const container = document.getElementById('participants-container');
+            const participantId = `participant-${participantCounter}`;
+            const row = document.createElement('div');
+            row.className = 'p-4 border border-gray-200 rounded-lg bg-white/90 relative shadow-sm';
+            row.id = participantId;
+            row.innerHTML = `<button type="button" class="absolute top-2 right-2 text-red-500 hover:text-red-700" onclick="document.getElementById('${participantId}').remove()"><i class="fas fa-times-circle fa-lg"></i></button><div class="grid grid-cols-1 md:grid-cols-3 gap-4"><div><label class="block text-sm font-bold mb-1">Nombre Completo*</label><input type="text" name="nombre" class="input-field" required></div><div><label class="block text-sm font-bold mb-1">Documento*</label><input type="text" name="documento" class="input-field" required pattern="[0-9]+"></div><div><label class="block text-sm font-bold mb-1">Nº de Contacto*</label><input type="text" name="contacto" class="input-field" required pattern="[0-9]+"></div><div><label class="block text-sm font-bold mb-1">Edad*</label><input type="number" name="edad" class="input-field" required min="1" max="120"></div><div><label class="block text-sm font-bold mb-1">Género*</label><select name="genero" class="input-field" required><option value="Masculino">Masculino</option><option value="Femenino">Femenino</option><option value="Otro">Otro</option></select></div><div><label class="block text-sm font-bold mb-1">Entidad</label><input type="text" name="entidad" class="input-field"></div><div><label class="block text-sm font-bold mb-1">Tipo de Población*</label><select name="poblacion" class="input-field" required>${TIPOS_POBLACION.map(p => `<option value="${p}">${p}</option>`).join('')}</select></div><div class="md:col-span-2"><label class="block text-sm font-bold mb-1">Secretaría*</label><select name="secretaria" class="input-field" required>${SECRETARIAS.map(s => `<option value="${s}">${s}</option>`).join('')}</select></div></div>`;
+            container.appendChild(row);
+        }
+        
+        document.getElementById('add-participant-btn').addEventListener('click', addParticipantRow);
+
+        function drawTextSignature(doc, pageWidth, signatureY) {
+            const signatureX = pageWidth / 2;
+            doc.setDrawColor('#333333');
+            doc.setLineWidth(0.5);
+            doc.line(signatureX - 40, signatureY, signatureX + 40, signatureY);
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(10);
+            doc.text('Firma Autorizada', signatureX, signatureY + 5, { align: 'center' });
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(9);
+            doc.text('Jefe de Talento Humano', signatureX, signatureY + 10, { align: 'center' });
+        }
+
+        async function generateCertificate(participant, topicName, signatureUrl) {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF({
+                orientation: 'landscape',
+                unit: 'mm',
+                format: 'letter'
+            });
+
+            const pageWidth = doc.internal.pageSize.getWidth();
+            const pageHeight = doc.internal.pageSize.getHeight();
+            const margin = 10;
+
+            // 1. Draw a decorative border
+            doc.setDrawColor(0, 90, 156); // Primary Blue
+            doc.setLineWidth(1.5);
+            doc.rect(margin, margin, pageWidth - margin * 2, pageHeight - margin * 2);
+            doc.setDrawColor(180, 180, 180); // Light Gray
+            doc.setLineWidth(0.5);
+            doc.rect(margin + 2, margin + 2, pageWidth - (margin + 2) * 2, pageHeight - (margin + 2) * 2);
+
+            // 2. Add Logos (Seal and Watermark)
+            const logoImg = document.getElementById('pdf-logo');
+            if (logoImg && logoImg.complete) {
+                try {
+                    // Small seal in the corner
+                    doc.addImage(logoImg, 'PNG', margin + 5, margin + 5, 25, 25);
+                    
+                    // Watermark in the center
+                    doc.saveGraphicsState();
+                    doc.setGState(new doc.GState({ opacity: 0.08 }));
+                    const watermarkSize = 100;
+                    const watermarkX = (pageWidth - watermarkSize) / 2;
+                    const watermarkY = (pageHeight - watermarkSize) / 2;
+                    doc.addImage(logoImg, 'PNG', watermarkX, watermarkY, watermarkSize, watermarkSize);
+                    doc.restoreGraphicsState();
+                } catch (e) {
+                    console.error("Could not add logo to PDF", e);
+                }
+            }
+
+            // 3. Add Titles
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(14);
+            doc.setTextColor('#333333');
+            doc.text('ALCALDÍA MUNICIPAL DE NOCAIMA', pageWidth / 2, margin + 20, { align: 'center' });
+            
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(10);
+            doc.text('Secretaría de Talento Humano', pageWidth / 2, margin + 26, { align: 'center' });
+
+            doc.setFont('times', 'bold');
+            doc.setFontSize(32);
+            doc.setTextColor(0, 90, 156); // Primary Blue
+            doc.text('Certificado de Participación', pageWidth / 2, 55, { align: 'center' });
+
+            // 4. Body Text
+            doc.setFont('times', 'normal');
+            doc.setFontSize(16);
+            doc.setTextColor('#333333');
+            doc.text('Se otorga el presente a:', pageWidth / 2, 75, { align: 'center' });
+
+            // 5. Participant Name (in Green)
+            doc.setFont('times', 'bolditalic');
+            doc.setFontSize(36);
+            doc.setTextColor(34, 124, 38); // Green
+            doc.text(participant.nombre, pageWidth / 2, 95, { align: 'center' });
+
+            // 6. Reason for Certificate
+            doc.setFont('times', 'normal');
+            doc.setFontSize(14);
+            doc.setTextColor('#333333');
+            doc.text('Por su valiosa participación y culminación satisfactoria de la capacitación en:', pageWidth / 2, 112, { align: 'center' });
+            
+            // Topic Name (in Green)
+            doc.setFont('times', 'bold');
+            doc.setFontSize(18);
+            doc.setTextColor(34, 124, 38); // Green
+            doc.text(`"${topicName}"`, pageWidth / 2, 125, { align: 'center' });
+
+            doc.setFont('times', 'normal');
+            doc.setFontSize(12);
+            doc.setTextColor('#333333');
+            doc.text('demostrando su compromiso con el fortalecimiento institucional.', pageWidth / 2, 135, { align: 'center' });
+
+            // 7. Date of issue
+            doc.setFontSize(12);
+            doc.text(`Expedido en Nocaima, Cundinamarca, a los ${new Date().getDate()} días del mes de ${new Date().toLocaleString('es-CO', { month: 'long' })} de ${new Date().getFullYear()}.`, pageWidth / 2, 155, { align: 'center' });
+            
+            // 8. Signature
+            const signatureY = pageHeight - 45;
+            drawTextSignature(doc, pageWidth, signatureY);
+
+            if (signatureUrl) {
+                const toDataURL = url => fetch(url)
+                    .then(response => {
+                        if (!response.ok) { throw new Error('Network response was not ok.'); }
+                        return response.blob();
+                    })
+                    .then(blob => new Promise((resolve, reject) => {
+                        const reader = new FileReader();
+                        reader.onloadend = () => resolve(reader.result);
+                        reader.onerror = reject;
+                        reader.readAsDataURL(blob);
+                    }));
+                
+                try {
+                    const signatureDataUrl = await toDataURL(signatureUrl);
+                    const signatureWidth = 40;
+                    const signatureHeight = 15;
+                    const signatureX = (pageWidth / 2) - (signatureWidth / 2);
+                    doc.addImage(signatureDataUrl, 'PNG', signatureX, signatureY - signatureHeight, signatureWidth, signatureHeight);
+                } catch (error) {
+                    console.error("Error loading signature image. Only text signature will be shown.", error);
+                }
+            }
+
+            // 9. Validation Code (in Red)
+            doc.setFont('courier', 'bold');
+            doc.setFontSize(10);
+            doc.setTextColor(211, 47, 47); // Red
+            const validationText = `Código de validación: ${participant.validationCode}`;
+            doc.text(validationText, margin, pageHeight - margin - 5);
+
+            doc.save(`Certificado-${participant.nombre}.pdf`);
+        }
+
+
+        document.getElementById('attendance-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const submitBtn = document.getElementById('submit-attendance-btn');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = `<i class="fas fa-spinner fa-spin mr-2"></i> Guardando...`;
+
+            try {
+                if (!currentTopicId) throw new Error("ID de planilla no definido.");
+                
+                const participants = document.querySelectorAll('#participants-container > div');
+                if (participants.length === 0) throw new Error("Debe agregar al menos un asistente.");
+
+                const existingDocuments = new Set(currentAttendees.map(att => att.documento));
+                const newDocumentsInBatch = new Set();
+                const newParticipantsData = [];
+                const topicName = document.getElementById('topic-title').textContent;
+
+                for (const p_row of participants) {
+                    const validationCode = Math.random().toString(36).substring(2, 10).toUpperCase();
+                    const participantData = {
+                        nombre: p_row.querySelector('[name="nombre"]').value.trim(),
+                        documento: p_row.querySelector('[name="documento"]').value.trim(),
+                        contacto: p_row.querySelector('[name="contacto"]').value.trim(),
+                        edad: p_row.querySelector('[name="edad"]').value,
+                        genero: p_row.querySelector('[name="genero"]').value,
+                        entidad: p_row.querySelector('[name="entidad"]').value.trim(),
+                        poblacion: p_row.querySelector('[name="poblacion"]').value,
+                        secretaria: p_row.querySelector('[name="secretaria"]').value,
+                        timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                        validationCode: validationCode
+                    };
+
+                    if (!participantData.nombre || !participantData.documento || !participantData.contacto || !participantData.edad) {
+                        throw new Error("Por favor, complete todos los campos obligatorios (*).");
+                    }
+                    if (existingDocuments.has(participantData.documento)) {
+                        throw new Error(`El participante con documento ${participantData.documento} ya está registrado.`);
+                    }
+                    if (newDocumentsInBatch.has(participantData.documento)) {
+                        throw new Error(`El documento ${participantData.documento} está duplicado en este formulario.`);
+                    }
+                    newDocumentsInBatch.add(participantData.documento);
+                    newParticipantsData.push(participantData);
+                }
+
+                const batch = db.batch();
+                newParticipantsData.forEach(p => batch.set(db.collection(currentTopicId).doc(), p));
+                await batch.commit();
+                
+                showToast('Asistencia guardada. Generando certificados...', 'success');
+
+                const configDoc = await db.collection(currentTopicId).doc('_config').get();
+                const signatureUrl = configDoc.data()?.signatureUrl;
+
+                for (const p of newParticipantsData) {
+                    await generateCertificate(p, topicName, signatureUrl);
+                }
+
+                document.getElementById('participants-container').innerHTML = '';
+                addParticipantRow();
+
+            } catch (error) {
+                showToast(error.message, 'error');
+                console.error("Error en el registro:", error);
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = `<i class="fas fa-save mr-2"></i> GUARDAR Y GENERAR CERTIFICADO`;
+            }
+        });
+
+        // --- LÓGICA DEL PANEL DE ADMINISTRACIÓN ---
+        function populateAdminForm() {
+            const secretariaSelect = document.getElementById('admin-secretaria');
+            if (secretariaSelect.options.length < SECRETARIAS.length) {
+                 secretariaSelect.innerHTML = SECRETARIAS.map(s => `<option value="${s}">${s}</option>`).join('');
+            }
+        }
+
+        async function loadAdminReportsList() {
+            const topics = (allTopics.length > 0) ? allTopics : await fetchAllTopics();
+            adminReportsList.innerHTML = '';
+            if (topics.length === 0) {
+                adminReportsList.innerHTML = '<p class="text-gray-500">No hay planillas para generar reportes.</p>';
+                return;
+            }
+
+            topics.sort((a, b) => a.name.localeCompare(b.name)).forEach(topic => {
+                adminReportsList.innerHTML += `
+                    <div class="flex justify-between items-center p-3 bg-white/70 rounded-lg">
+                        <span class="font-semibold text-gray-700">${topic.name}</span>
+                        <button class="btn btn-primary py-1 px-3" data-topic-id="${topic.id}"><i class="fas fa-chart-line mr-2"></i> Ver Reporte</button>
+                    </div>
+                `;
+            });
+        }
+
+        adminReportsList.addEventListener('click', e => {
+            const button = e.target.closest('button');
+            if (button && button.dataset.topicId) {
+                showReportView(button.dataset.topicId);
+            }
+        });
+
+        function showReportView(topicId) {
+            adminPanel.style.display = 'none';
+            reportsPanel.style.display = 'block';
+            loadReportData(topicId);
+        }
+
+        async function loadReportData(topicId) {
+            if (unsubscribeFromTopic) unsubscribeFromTopic();
+            // Destroy charts from user view if they exist
+            if (secretariaChart) {
+                secretariaChart.destroy();
+                secretariaChart = null;
+            }
+            if (dateChart) {
+                dateChart.destroy();
+                dateChart = null;
+            }
+
+            currentTopicId = topicId;
+            
+            const topic = allTopics.find(t => t.id === topicId);
+            document.getElementById('reports-topic-title').textContent = `Reporte: ${topic ? topic.name : 'Cargando...'}`;
+            
+            updateAttendeesTable([]);
+            listenForAttendanceChanges(topicId, 'admin');
+        }
+
+        document.getElementById('admin-topic-name').addEventListener('input', (e) => {
+            const topicName = e.target.value;
+            const topicId = topicName.toLowerCase().replace(/\s+/g, '_').replace(/[^a-z0-9_]/g, '');
+            document.getElementById('admin-topic-id').value = topicId;
+        });
+
+        document.getElementById('admin-clear-btn').addEventListener('click', () => {
+            document.getElementById('admin-form').reset();
+            document.getElementById('admin-topic-id').value = '';
+        });
+
+        document.getElementById('admin-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const topicId = document.getElementById('admin-topic-id').value.trim();
+            const topicName = document.getElementById('admin-topic-name').value.trim();
+            const secretaria = document.getElementById('admin-secretaria').value;
+            const deadlineStr = document.getElementById('admin-deadline').value;
+            const signatureUrl = document.getElementById('admin-signature-url').value.trim();
+
+            if (!topicId || !topicName || !deadlineStr) {
+                showToast('Por favor, complete todos los campos del formulario.', 'error');
+                return;
+            }
+
+            const deadline = new Date(deadlineStr);
+            if (isNaN(deadline.getTime())) {
+                showToast('La fecha límite no es válida.', 'error');
+                return;
+            }
+
+            const batch = db.batch();
+            const configRef = db.collection(topicId).doc('_config');
+            const configData = { 
+                name: topicName, 
+                secretariaResponsable: secretaria, 
+                fechaLimite: firebase.firestore.Timestamp.fromDate(deadline), 
+                status: 'activo', 
+                createdAt: firebase.firestore.FieldValue.serverTimestamp() 
+            };
+
+            if (signatureUrl) {
+                configData.signatureUrl = signatureUrl;
+            }
+
+            batch.set(configRef, configData, { merge: true });
+
+            const metadataRef = db.collection('_metadata').doc('topics');
+            const newTopicMetadata = { id: topicId, name: topicName };
+            batch.set(metadataRef, { list: firebase.firestore.FieldValue.arrayUnion(newTopicMetadata) }, { merge: true });
+
+            try {
+                await batch.commit();
+                showToast(`Planilla '${topicName}' guardada con éxito.`, 'success');
+                document.getElementById('admin-form').reset();
+                document.getElementById('admin-topic-id').value = '';
+                await fetchAllTopics(); // Refresh cache
+                showAdminView();
+            } catch (error) {
+                console.error("Error guardando el tema:", error);
+                showToast('Ocurrió un error al guardar la planilla.', 'error');
+            }
+        });
+
+        // --- LÓGICA DEL DASHBOARD Y REPORTES ---
+        function listenForAttendanceChanges(topicId, viewType = 'user') {
+            const query = db.collection(topicId).where('timestamp', '!=', null).orderBy('timestamp', 'desc');
+            unsubscribeFromTopic = query.onSnapshot(snapshot => {
+                currentAttendees = [];
+                snapshot.forEach(doc => {
+                    if (doc.data().documento) {
+                        currentAttendees.push({ id: doc.id, ...doc.data() });
+                    }
+                });
+                
+                if (viewType === 'user') {
+                    updateDashboardMetrics(currentAttendees);
+                    updateSimpleAttendeesTable(currentAttendees);
+                    updateDateChart(currentAttendees); // Call new chart function
+                } else if (viewType === 'admin') {
+                    updateAttendeesTable(currentAttendees);
+                }
+            }, error => console.error("Error en listener:", error));
+        }
+
+        function updateSimpleAttendeesTable(attendees) {
+            const tableBody = document.getElementById('simple-attendees-table-body');
+            if (!tableBody) return;
+            tableBody.innerHTML = '';
+            if (attendees.length === 0) {
+                tableBody.innerHTML = '<tr><td colspan="2" class="text-center py-4">Aún no hay asistentes registrados.</td></tr>';
+                return;
+            }
+            attendees.forEach(att => {
+                tableBody.innerHTML += `<tr><td class="border-t py-2 px-4">${att.nombre}</td><td class="border-t py-2 px-4">${att.secretaria}</td></tr>`;
+            });
+        }
+
+        function updateAttendeesTable(attendees) {
+            const tableBody = document.getElementById('attendees-table-body');
+            if (!tableBody) return;
+            const headers = tableBody.parentElement.querySelector('thead tr');
+            headers.innerHTML = `
+                <th class="py-2 px-4 text-left">Nombre Completo</th>
+                <th class="py-2 px-4 text-left">Documento</th>
+                <th class="py-2 px-4 text-left">Contacto</th>
+                <th class="py-2 px-4 text-left">Secretaría</th>
+                <th class="py-2 px-4 text-left">Código Validación</th>
+            `;
+            tableBody.innerHTML = attendees.length > 0
+                ? attendees.map(att => `
+                    <tr>
+                        <td class="border-t py-2 px-4">${att.nombre}</td>
+                        <td class="border-t py-2 px-4">${att.documento}</td>
+                        <td class="border-t py-2 px-4">${att.contacto}</td>
+                        <td class="border-t py-2 px-4">${att.secretaria}</td>
+                        <td class="border-t py-2 px-4 font-mono text-xs">${att.validationCode || 'N/A'}</td>
+                    </tr>`).join('')
+                : '<tr><td colspan="5" class="text-center py-4">Aún no hay asistentes registrados.</td></tr>';
+        }
+
+        function updateDateChart(attendees) {
+            const chartEl = document.getElementById('date-chart');
+            if (!chartEl) return;
+
+            const dateCounts = attendees.reduce((acc, att) => {
+                if (att.timestamp && att.timestamp.toDate) {
+                    const date = att.timestamp.toDate().toISOString().split('T')[0];
+                    acc[date] = (acc[date] || 0) + 1;
+                }
+                return acc;
+            }, {});
+
+            const sortedDates = Object.keys(dateCounts).sort((a,b) => new Date(a) - new Date(b));
+            const chartLabels = sortedDates;
+            const chartData = sortedDates.map(date => dateCounts[date]);
+
+            if (dateChart) dateChart.destroy();
+
+            dateChart = new Chart(chartEl.getContext('2d'), {
+                type: 'bar',
+                data: {
+                    labels: chartLabels,
+                    datasets: [{
+                        label: 'Asistentes por Día',
+                        data: chartData,
+                        backgroundColor: '#87CEEB',
+                        borderColor: '#64A2B8',
+                        borderWidth: 1,
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                stepSize: 1
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateDashboardMetrics(attendees) {
+            const totalEl = document.getElementById('total-attendees');
+            const chartEl = document.getElementById('secretaria-chart');
+            if (!totalEl || !chartEl) return;
+
+            totalEl.textContent = attendees.length;
+            const secretariaCounts = attendees.reduce((acc, att) => {
+                acc[att.secretaria] = (acc[att.secretaria] || 0) + 1;
+                return acc;
+            }, {});
+            const chartLabels = Object.keys(secretariaCounts);
+            const chartData = Object.values(secretariaCounts);
+            const ctx = chartEl.getContext('2d');
+            if (secretariaChart) secretariaChart.destroy();
+            
+            const pastelColors = ['#87CEEB', '#98FB98', '#FFFACD', '#ADD8E6', '#F0E68C', '#90EE90', '#FFB6C1', '#E6E6FA'];
+
+            secretariaChart = new Chart(ctx, { 
+                type: 'doughnut', 
+                data: { 
+                    labels: chartLabels, 
+                    datasets: [{ 
+                        label: 'Asistentes', 
+                        data: chartData, 
+                        backgroundColor: pastelColors,
+                        borderColor: 'rgba(255, 255, 255, 0.5)',
+                        borderWidth: 2,
+                        hoverOffset: 8
+                    }] 
+                }, 
+                options: { 
+                    responsive: true,
+                    plugins: { 
+                        legend: { 
+                            position: 'top',
+                            labels: {
+                                color: '#2c3e50',
+                                font: {
+                                    weight: 'bold'
+                                }
+                            }
+                        } 
+                    } 
+                } 
+            });
+        }
+
+        const { jsPDF } = window.jspdf;
+        document.getElementById('export-pdf-btn').addEventListener('click', () => {
+            if (currentAttendees.length === 0) {
+                showToast('No hay datos para exportar.', 'info');
+                return;
+            }
+            
+            const doc = new jsPDF({ orientation: 'landscape' });
+            const logo = document.getElementById('pdf-logo');
+            const topicInfo = allTopics.find(t => t.id === currentTopicId);
+            const topicName = topicInfo?.name || "Reporte de Asistencia";
+            const responsable = topicInfo?.secretariaResponsable || 'No asignada';
+
+            // 1. Header
+            if (logo && logo.complete) {
+                try {
+                    doc.addImage(logo, 'PNG', 15, 12, 25, 25);
+                } catch (e) {
+                    console.error("Error adding logo to PDF:", e);
+                }
+            }
+            
+            doc.setFontSize(18);
+            doc.setTextColor('#005A9C');
+            doc.text("REPORTE DE ASISTENCIA VIRTUAL", doc.internal.pageSize.getWidth() / 2, 22, { align: 'center' });
+
+            doc.setFontSize(10);
+            doc.setTextColor(100);
+            doc.text(`Tema: ${topicName}`, 15, 45);
+            doc.text(`Responsable: ${responsable}`, 15, 50);
+            doc.text(`Fecha de Reporte: ${new Date().toLocaleString()}`, 15, 55);
+
+            const totalText = `Total de Participantes: ${currentAttendees.length}`;
+            const totalTextWidth = doc.getStringUnitWidth(totalText) * 10 / doc.internal.scaleFactor;
+            doc.text(totalText, doc.internal.pageSize.getWidth() - 15 - totalTextWidth, 45);
+            
+            // 2. Table
+            const head = [['Nombre Completo', 'Documento', 'Contacto', 'Edad', 'Género', 'Entidad', 'Población', 'Secretaría', 'Código Validación']];
+            const body = currentAttendees.map(att => [
+                att.nombre,
+                att.documento,
+                att.contacto,
+                att.edad,
+                att.genero,
+                att.entidad || 'N/A',
+                att.poblacion,
+                att.secretaria,
+                att.validationCode || 'N/A'
+            ]);
+            
+            doc.autoTable({ 
+                startY: 65, 
+                head: head, 
+                body: body, 
+                theme: 'grid', 
+                headStyles: { fillColor: [0, 90, 156], textColor: 255 }, // #005A9C
+                styles: { fontSize: 8, cellPadding: 1.5 },
+                alternateRowStyles: { fillColor: [244, 247, 249] }, // #f4f7f9
+                columnStyles: {
+                    0: { cellWidth: 40 }, // Nombre
+                    1: { cellWidth: 25 }, // Documento
+                    2: { cellWidth: 25 }, // Contacto
+                    8: { cellWidth: 25 }  // Codigo
+                }
+            });
+
+            doc.save(`reporte_${currentTopicId}.pdf`);
+        });
+
+        document.getElementById('export-csv-btn').addEventListener('click', () => {
+            if (currentAttendees.length === 0) return showToast('No hay datos para exportar.', 'info');
+            const headers = ['Nombre Completo', 'Documento', 'Contacto', 'Edad', 'Género', 'Entidad', 'Tipo de Población', 'Secretaría', 'Código de Validación', 'Fecha de Registro'];
+            const rows = currentAttendees.map(att => {
+                const values = [
+                    att.nombre, att.documento, att.contacto, att.edad, att.genero, 
+                    att.entidad, att.poblacion, att.secretaria, 
+                    att.validationCode || 'N/A', 
+                    att.timestamp?.toDate().toISOString() || 'N/A'
+                ];
+                return values.map(v => `"${String(v).replace(/"/g, '""')}"`).join(',');
+            });
+            const csvContent = "data:text/csv;charset=utf-8," + [headers.join(','), ...rows].join('\r\n');
+            const link = document.createElement("a");
+            link.setAttribute("href", encodeURI(csvContent));
+            link.setAttribute("download", `asistencia_${currentTopicId}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        });
+        
+        // Updated print styles to target the new reports-panel
+        const printStyles = ` @media print { body * { visibility: hidden; } #reports-panel, #reports-panel * { visibility: visible; } #reports-panel { position: absolute; left: 0; top: 0; width: 100%; } header, #planillas-view, #attendance-panel, #admin-panel, #reports-panel .grid, #reports-panel .flex, #back-to-admin-panel-btn { display: none !important; } #attendees-table-body, #attendees-table-body *, h2#reports-topic-title, h3.text-xl { visibility: visible !important; } }`;
+        const styleSheet = document.createElement("style");
+        styleSheet.type = "text/css";
+        styleSheet.innerText = printStyles;
+        document.head.appendChild(styleSheet);
+        document.getElementById('print-btn').addEventListener('click', () => { window.print(); });
+
+        // --- UTILIDADES ---
+        function showToast(message, type = 'info') {
+            const backgroundColor = { info: '#3B82F6', success: '#10B981', error: '#EF4444' }[type];
+            Toastify({ text: message, duration: 3000, close: true, gravity: "top", position: "right", style: { background: backgroundColor } }).showToast();
+        }
+    </script>
+    
+</body>
+</html>
